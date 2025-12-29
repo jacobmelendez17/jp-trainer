@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PracticeMode {
+  WK_REFRESHER
+  GRAMMAR
+  PRONUNCIATION
+  SENTENCE_TRANSLATION
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // If you do email/password:
+  passwordHash String?
+
+  // WaniKani
+  wanikaniConnection WanikaniConnection?
+
+  // Practice tracking
+  attempts PracticeAttempt[]
+}
+
+model WanikaniConnection {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Store encrypted token (never plaintext)
+  tokenEnc  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PracticeAttempt {
+  id        String       @id @default(cuid())
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  mode      PracticeMode
+  correct   Boolean
+  prompt    String       // what you showed (kanji or sentence id)
+  answer    String       // user input
+  meta      Json?        // extra info: wk subjectId, level, etc.
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, mode, createdAt])
+}
