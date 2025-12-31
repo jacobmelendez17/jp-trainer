@@ -1,0 +1,20 @@
+{
+  "name": "jp-trainer",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm --workspace apps/web run dev",
+    "dev:api": "npm --workspace apps/api run dev",
+    "dev": "npm run dev:api & npm run dev:web"
+  },
+  "devDependencies": {
+    "dotenv": "^17.2.3",
+    "prisma": "^6.19.1"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.1"
+  }
+}

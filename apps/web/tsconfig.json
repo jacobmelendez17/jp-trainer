@@ -30,5 +30,10 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+  "node_modules",
+  "../node_modules/.svelte2tsx-language-server-files",
+  "../../node_modules/.svelte2tsx-language-server-files"
+]
+
 }

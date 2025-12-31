@@ -5,8 +5,13 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
+
 app.use(cors({ origin: "http://localhost:3000", credentials: true}));
 app.use(express.json());
+
+app.get("/", (_req, res) => {
+    res.send("JP Trainer API is running");
+});
 
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
