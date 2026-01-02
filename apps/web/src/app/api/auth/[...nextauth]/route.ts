@@ -12,7 +12,7 @@ const handler = NextAuth({
     providers: [
         GitHub({
             clientId: process.env.GITHUB_ID!,
-            clientSecret: process.env.GITHUB_SECRETE!,
+            clientSecret: process.env.GITHUB_SECRET!,
         }),
         Google({
             clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -27,7 +27,7 @@ const handler = NextAuth({
             async authorize(credentials) {
                 const email = credentials?.email?.toLowerCase().trim();
                 const password = credentials?.password ?? "";
-                if (!email || ! password) return null;
+                if (!email || !password) return null;
 
                 const user = await prisma.user.findUnique({ where: { email } });
                 if (!user?.passwordHash) return null;
