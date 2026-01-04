@@ -11,7 +11,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Not authenticated" });
     }
 
-    const body = await req.json({ error: "token is required" });
+    const body = await req.json().catch(() => null);
     const token = body?.token?.toString()?.trim();
 
     const user = await prisma.user.findUnique({ where: { email: userEmail } });
