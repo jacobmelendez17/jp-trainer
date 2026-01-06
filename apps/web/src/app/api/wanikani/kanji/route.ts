@@ -35,11 +35,12 @@ async function wkGetAll<T>(token: string, path: string) {
             headers: { Authorization: `Bearer $ ${token}` },
             cache: "no-store",
         });
-        const json = await resp.json();
+        const json: unknown = await resp.json();
         if (!resp.ok) throw new Error(JSON.stringify(json));
 
-        out.push(...(json.data as T[]));
-        url = json.pages?.next_url ?? null;
+        const parsed = json as { data: T[]; pages?: { next_url?: string | null } };
+        out.push(...(parsed.data as T[]));
+        url = parsed.pages?.next_url ?? null;
     }
 
     return out;

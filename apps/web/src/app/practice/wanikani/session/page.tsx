@@ -42,9 +42,8 @@ export default function WkSessionPage() {
     useEffect(() => {
         (async () => {
             setLoading(true);
-            const res = await fetch(
-                `api/wanikani/anji?minLevel=${minLevel}&maxLevel=${maxLevel}&limit=${limit}`
-            );
+            const res = await fetch(`/api/wanikani/kanji?minLevel=${minLevel}&maxLevel=${maxLevel}&limit=${limit}`);
+
             const data = await res.json();
             setItems(data.items ?? []);
             setLoading(false);
@@ -97,9 +96,123 @@ export default function WkSessionPage() {
         return (
             <main className="min-h-screen grid place-items-center bg-[#faf7f0] p-6">
                 <div className="max-w-md rounded-2xl border bg-white p-6 shadow-sm space-y-3">
-                    
+                    <h1 className="text-xl font-semibold">No items found</h1>
+                    <p className="text-sm text-neutral-600">
+                        You may not have any Guru or above kanji in that level range.
+                    </p>
+                    <button className="rounded-xl border px-4 py-2" onClick={() =>router.push("/practice/wanikani/setup")}>
+                        Back to setup
+                    </button>
+                </div>
+            </main>
+        );
+    }
+
+    if (done) {
+        const missed = results.filter((r) => !r.ok);
+        return (
+            <main className="min-h-screen bg-[#faf7f0] p-6">
+                <div className="mx-auto max-w-xl rounded-2xl border bg-white p-6 shadow-sm space-y-4">
+                    <h1 className="text-2xl font-semibol">Session complete</h1>
+                    <p className="text-sm text-neutral-600">Accuracy: {accuracy}%</p>
+
+                    {missed.length > 0 ? (
+                        <div className="rounded-xl border bg-neutral-50 p-4">
+                            <div className="text-sm font-medium mb-2">Missed</div>
+                            <div className="flex flex-wrap gap-2">
+                                {missed.map((m) => (
+                                    <span key={m.subjectId} className="rounded-lg border bg-white px-2 py-1 text-sm">
+                                        {m.characters}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="rounded-xl border bg-neutral-50 p-4 text-sm">
+                            Perfect run!
+                        </div>
+                    )}
+
+                    <div className="flex gap-2">
+                        <button className="flex-1 rounded-xl border px-4 py-2" onClick={() => router.push("/practice/wanikani/setup")}>
+                            New session
+                        </button>
+                        <button className="flex-1 rounded-xl bg-black text-white px-4 py-2" onClick={() => router.push("/dashboard")}>
+                            New session
+                        </button>
+                    </div>
                 </div>
             </main>
         )
     }
+
+    return (
+        <main className="min-h-screen bg-[#faf750] p-6">
+            <div className="mx-auto max-w-xl rounded-2xl border bg-white p-6 shadow-sm space-y-4">
+                <div className="flex items-center justify-between text-sm text-neutral-600">
+                    <span>
+                        {idx + 1}  {items.length}
+                    </span>
+                    <span>Level {current.level}</span>
+                </div>
+
+                <div className="text-center text-6xl font-semibold py-6">{current.characters}</div>
+
+                <input 
+                    className="w-full rounded-xl border px-3 py-3 text-lg"
+                    placeholder="Type the English meaning"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter" && !feedback) submit
+                        if (e.key === "Enter" && feedback) next();
+                    }}
+                    disabled={!!feedback}
+                />
+
+                <div className="flex gap-2">
+                    {!feedback ? (
+                        <>
+                            <button
+                                className="flex-1 rounded-xl bg-black py-2 text-white hover:opacity-90"
+                                onClick={submit}
+                            >
+                                Submit
+                            </button>
+                            <button
+                                className="flex-1 rounded-xl border py-2"
+                                onClick={() => setRevealed(true)}
+                            >
+                                Reveal
+                            </button>
+                        </>
+                    ) : (
+                        <button
+                            className="flex-1 rounded-xl bg-black py-2 text-white hover:opacity-90" onClick={next}>
+                            Next
+                        </button>
+                    )}
+                </div>
+
+                {(revealed || feedback) && (
+                    <div className="rounded-xl border bg-neutral-50 p-3 text-sm space-y-2">
+                        <div className="font-medium">Accepted meanings</div>
+                        <div className="flex flex-wrap gap-2">
+                            {current.acceptedMeanings.map((m) => (
+                                <span key={m} className="rounded-lg border bg-white px-2 py-1">
+                                    {m}
+                                </span>
+                            ))}
+                        </div>
+
+                        {feedback && (
+                            <div className={`text-sm ${feedback.ok ? "text-green-700" : "text-red-700"}`}>
+                                {feedback.ok ? "Correct" : "Incorrect"}
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+        </main>
+    );
 }
