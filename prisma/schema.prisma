@@ -23,6 +23,8 @@ model User {
 
   wanikaniConnection WanikaniConnection?
 
+  pronunciationProgress UserPronunciationChallengeProgress[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -71,4 +73,56 @@ model WanikaniConnection {
   tokenEnc  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model PronunciationChallenge {
+  id         String   @id @default(cuid())
+  title      String
+  orderIndex Int      @unique
+
+  sentences  PronunciationSentence[]
+  progresses UserPronunciationChallengeProgress[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PronunciationSentence {
+  id           String   @id @default(cuid())
+  challengeId  String
+  challenge    PronunciationChallenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  // Display text (kanji/kana)
+  jpText       String
+
+  // Canonical reading to grade against (recommend: hiragana)
+  jpReading    String
+
+  // Optional pre-built ruby HTML, if you want perfect furigana rendering
+  furiganaHtml String?
+
+  // English translation
+  enText       String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([challengeId])
+}
+
+model UserPronunciationChallengeProgress {
+  id          String  @id @default(cuid())
+  userId      String
+  challengeId String
+  stars       Int     @default(0) // 0..5
+
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challenge   PronunciationChallenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@unique([userId, challengeId])
+  @@index([userId])
+  @@index([challengeId])
 }
