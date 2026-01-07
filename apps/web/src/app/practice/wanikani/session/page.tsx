@@ -63,7 +63,6 @@ export default function WkSessionPage() {
                 return;
             }
 
-            // data is JSON here
             setItems((data as any).items ?? []);
             setLoading(false);
             } catch (err) {
@@ -191,7 +190,7 @@ export default function WkSessionPage() {
                         if (e.key === "Enter" && !feedback) submit();
                         if (e.key === "Enter" && feedback) next();
                     }}
-                    disabled={!!feedback}
+                    readOnly={!!feedback}
                 />
 
                 <div className="flex gap-2">
