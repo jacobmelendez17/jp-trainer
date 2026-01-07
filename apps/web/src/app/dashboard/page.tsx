@@ -18,18 +18,18 @@ function Tile({
 		return (
 			<div className={`${base} opacity-60`}>
 				<div className="flex items-center justify-between">
-					<h2 className="text-lg font-semibold">{title}</h2>
+					<h2 className="text-lg font-semibold text-neutral-800">{title}</h2>
 					<span className="text-xs rounded-full border px-2 py-1">Coming soon</span>
 				
 				</div>
-				<p className="mt-2 text-sm text-neutral-600">{desc}</p>
+				<p className="mt-2 text-sm text-neutral-800">{desc}</p>
 			</div>
 		)
 	}
 
 	return (
 		<Link href={href ?? "#"} className={`${base} hover:shadow translation`}>
-			<h2 className="text-lg font-semibold">{title}</h2>
+			<h2 className="text-lg font-semibold text-neutral-800">{title}</h2>
 			<p className="mt-2 text-sm text-neutral-600">{desc}</p>
 		</Link>
 	);
@@ -42,7 +42,7 @@ export default async function DashboardPage() {
 	return (
 		<main className="min-h-screen bg-[#faf7f0] p-6">
 			<header className="mb-6">
-				<h1 className="text-2xl font-semibold text-neutral-600">Dashboard</h1>
+				<h1 className="text-2xl font-semibold text-neutral-800">Dashboard</h1>
 				<p className="text-sm text-neutral-600">Signed in as {session.user?.email}</p>
 			</header>
 
@@ -55,7 +55,7 @@ export default async function DashboardPage() {
 				/>
 				<Tile
 					title="Verb Conjugation"
-					desc="COnjugate ichidan, godan, and irregular verbs "
+					desc="Conjugate ichidan, godan, and irregular verbs "
 					href=""
 					enabled={false}
 				/>

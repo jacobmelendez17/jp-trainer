@@ -116,7 +116,7 @@ export default function WkSessionPage() {
 
     if(!loading && items.length === 0) {
         return (
-            <main className="min-h-screen grid place-items-center bg-[#faf7f0] p-6">
+            <main className="min-h-screen grid place-items-center p-6">
                 <div className="max-w-md rounded-2xl border bg-white p-6 shadow-sm space-y-3">
                     <h1 className="text-xl font-semibold">No items found</h1>
                     <p className="text-sm text-neutral-600">
@@ -133,7 +133,7 @@ export default function WkSessionPage() {
     if (done) {
         const missed = results.filter((r) => !r.ok);
         return (
-            <main className="min-h-screen bg-[#faf7f0] p-6">
+            <main className="min-h-screen p-6">
                 <div className="mx-auto max-w-xl rounded-2xl border bg-white p-6 shadow-sm space-y-4">
                     <h1 className="text-2xl font-semibol">Session complete</h1>
                     <p className="text-sm text-neutral-600">Accuracy: {accuracy}%</p>
@@ -169,7 +169,7 @@ export default function WkSessionPage() {
     }
 
     return (
-        <main className="min-h-screen bg-[#faf750] p-6">
+        <main className="min-h-screen bg-[#faf7f0] p-6">
             <div className="mx-auto max-w-xl rounded-2xl border bg-white p-6 shadow-sm space-y-4">
                 <div className="flex items-center justify-between text-sm text-neutral-600">
                     <span>
@@ -178,10 +178,10 @@ export default function WkSessionPage() {
                     <span>Level {current.level}</span>
                 </div>
 
-                <div className="text-center text-6xl font-semibold py-6">{current.characters}</div>
+                <div className="text-center text-6xl font-semibold py-6 text-neutral-800">{current.characters}</div>
 
                 <input 
-                    className="w-full rounded-xl border px-3 py-3 text-lg"
+                    className="w-full rounded-xl border px-3 py-3 text-lg text-neutral-800"
                     placeholder="Type the English meaning"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
@@ -202,7 +202,7 @@ export default function WkSessionPage() {
                                 Submit
                             </button>
                             <button
-                                className="flex-1 rounded-xl border py-2"
+                                className="flex-1 rounded-xl border py-2 text-neutral-800"
                                 onClick={() => setRevealed(true)}
                             >
                                 Reveal
@@ -217,9 +217,9 @@ export default function WkSessionPage() {
                 </div>
 
                 {(revealed || feedback) && (
-                    <div className="rounded-xl border bg-neutral-50 p-3 text-sm space-y-2">
+                    <div className="rounded-xl border bg-neutral-50 p-3 text-sm space-y-2 text-neutral-800">
                         <div className="font-medium">Accepted meanings</div>
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-wrap gap-2 text-neutral-800">
                             {current.acceptedMeanings.map((m) => (
                                 <span key={m} className="rounded-lg border bg-white px-2 py-1">
                                     {m}
@@ -229,7 +229,7 @@ export default function WkSessionPage() {
 
                         {feedback && (
                             <div className={`text-sm ${feedback.ok ? "text-green-700" : "text-red-700"}`}>
-                                {feedback.ok ? "Correct" : "Incorrect"}
+                                {feedback.ok ? "Correct!" : "Incorrect"}
                             </div>
                         )}
                     </div>

@@ -12,16 +12,16 @@ export default function WkSetupPage() {
   return (
     <main className="min-h-screen bg-[#faf7f0] p-6">
       <div className="mx-auto max-w-xl rounded-2xl border bg-white p-6 shadow-sm space-y-4">
-        <h1 className="text-2xl font-semibold">WaniKani Refresher</h1>
+        <h1 className="text-2xl font-semibold text-neutral-800">WaniKani Refresher</h1>
         <p className="text-sm text-neutral-600">
           Review Guru+ kanji meanings. Choose a level range and how many to do.
         </p>
 
         <div className="grid grid-cols-2 gap-3">
           <label className="space-y-1">
-            <div className="text-sm font-medium">Min level</div>
+            <div className="text-sm font-medium text-neutral-800">Min level</div>
             <input
-              className="w-full rounded-xl border px-3 py-2"
+              className="w-full rounded-xl border px-3 py-2 text-neutral-800"
               type="number"
               min={1}
               max={60}
@@ -31,9 +31,9 @@ export default function WkSetupPage() {
           </label>
 
           <label className="space-y-1">
-            <div className="text-sm font-medium">Max level</div>
+            <div className="text-sm font-medium text-neutral-800">Max level</div>
             <input
-              className="w-full rounded-xl border px-3 py-2"
+              className="w-full rounded-xl border px-3 py-2 text-neutral-800"
               type="number"
               min={1}
               max={60}
@@ -44,9 +44,9 @@ export default function WkSetupPage() {
         </div>
 
         <label className="space-y-1 block">
-          <div className="text-sm font-medium">How many</div>
+          <div className="text-sm font-medium text-neutral-800">How many</div>
           <input
-            className="w-full rounded-xl border px-3 py-2"
+            className="w-full rounded-xl border px-3 py-2 text-neutral-800"
             type="number"
             min={5}
             max={100}
