@@ -42,7 +42,7 @@ export default async function DashboardPage() {
 	return (
 		<main className="min-h-screen bg-[#faf7f0] p-6">
 			<header className="mb-6">
-				<h1 className="text-2xl font-semibold">Dashboard</h1>
+				<h1 className="text-2xl font-semibold text-neutral-600">Dashboard</h1>
 				<p className="text-sm text-neutral-600">Signed in as {session.user?.email}</p>
 			</header>
 

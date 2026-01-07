@@ -42,13 +42,35 @@ export default function WkSessionPage() {
     useEffect(() => {
         (async () => {
             setLoading(true);
-            const res = await fetch(`/api/wanikani/kanji?minLevel=${minLevel}&maxLevel=${maxLevel}&limit=${limit}`);
 
-            const data = await res.json();
-            setItems(data.items ?? []);
+            try {
+            const res = await fetch(
+                `/api/wanikani/kanji?minLevel=${minLevel}&maxLevel=${maxLevel}&limit=${limit}`
+            );
+
+            // Try to parse JSON; if it fails, grab text so we can see what it was
+            const contentType = res.headers.get("content-type") ?? "";
+            const isJson = contentType.includes("application/json");
+
+            const data = isJson ? await res.json() : await res.text();
+
+            if (!res.ok) {
+                console.error("Kanji API error:", data);
+                setItems([]);
+                setLoading(false);
+                return;
+            }
+
+            // data is JSON here
+            setItems((data as any).items ?? []);
             setLoading(false);
+            } catch (err) {
+            console.error("Fetch failed:", err);
+            setItems([]);
+            setLoading(false);
+            }
         })();
-    }, [minLevel, maxLevel, limit]);
+        }, [minLevel, maxLevel, limit]);
 
     const acceptedNormalized = useMemo(() => {
         if (!current) return [];
@@ -151,7 +173,7 @@ export default function WkSessionPage() {
             <div className="mx-auto max-w-xl rounded-2xl border bg-white p-6 shadow-sm space-y-4">
                 <div className="flex items-center justify-between text-sm text-neutral-600">
                     <span>
-                        {idx + 1}  {items.length}
+                        {idx + 1} / {items.length}
                     </span>
                     <span>Level {current.level}</span>
                 </div>
@@ -164,7 +186,7 @@ export default function WkSessionPage() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => {
-                        if (e.key === "Enter" && !feedback) submit
+                        if (e.key === "Enter" && !feedback) submit();
                         if (e.key === "Enter" && feedback) next();
                     }}
                     disabled={!!feedback}
