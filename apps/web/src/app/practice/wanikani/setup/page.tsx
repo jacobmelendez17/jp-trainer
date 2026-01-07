@@ -12,7 +12,7 @@ export default function WaniKaniSetupPage() {
 
   const allLevels = useMemo(() => Array.from({ length: 60 }, (_, i) => i + 1), []);
   const [selected, setSelected] = useState<Set<number>>(new Set([1]));
-  const [userLevel, setUserLevel] = useState<number>(24); // fallback for dev
+  const [userLevel, setUserLevel] = useState<number>(24);
   const [totalKanji, setTotalKanji] = useState<number>(0);
   const [countLoading, setCountLoading] = useState(false);
 
@@ -40,6 +40,12 @@ export default function WaniKaniSetupPage() {
         const res = await fetch(`/api/wanikani/kanji-count?levels=${csv}`, {
           signal: ac.signal,
         });
+        if (!res.ok) {
+          const text = await res.text().catch(() => "");
+          console.error("kanji-count failed:", res.status, text);
+          setTotalKanji(0);
+          return;
+        }
         const data = await res.json().catch(() => null);
         setTotalKanji(Number(data?.total ?? 0));
       } finally {
