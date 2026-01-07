@@ -23,6 +23,10 @@ export default function WkSessionPage() {
     const sp = useSearchParams();
     const router = useRouter();
 
+    const params = new URLSearchParams(window.location.search);
+    const levelsCsv = params.get("levels") ?? "1";
+
+
     const minLevel = Number(sp.get("minLevel") ?? "1");
     const maxLevel = Number(sp.get("maxLevel") ?? "60");
     const limit = Number(sp.get("limit") ?? "25");
@@ -44,9 +48,7 @@ export default function WkSessionPage() {
             setLoading(true);
 
             try {
-            const res = await fetch(
-                `/api/wanikani/kanji?minLevel=${minLevel}&maxLevel=${maxLevel}&limit=${limit}`
-            );
+            const res = await fetch(`/api/wanikani/kanji?levels=${levelsCsv}`);
 
             // Try to parse JSON; if it fails, grab text so we can see what it was
             const contentType = res.headers.get("content-type") ?? "";
