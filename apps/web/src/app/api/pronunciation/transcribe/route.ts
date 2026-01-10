@@ -8,7 +8,7 @@ function isWav(file: File) {
     return t.includes("wav") || n.endsWith(".wav");
 }
 
-async function trasncribeAzure(wavFile: File) {
+async function transcribeAzure(wavFile: File) {
     const key = process.env.AZURE_SPEECH_KEY;
     const region = process.env.AZURE_SPEECH_REGION;
 
@@ -16,15 +16,15 @@ async function trasncribeAzure(wavFile: File) {
         throw new Error("Azure not configured (missing AZURE KEY or AZURE REGION)");
     }
 
-    const url = `https://${region}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=ja=JP`;
+    const url = `https://${region}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=ja-JP`;
 
     const body = await wavFile.arrayBuffer();
 
     const res = await fetch(url, {
         method: "POST",
         headers: {
-            "Ocp-Apim-Subcription-Key": key,
-            "Content-Type": "audio/wav; codecs=audio/pcm; samplerate=1600",
+            "Ocp-Apim-Subscription-Key": key,
+            "Content-Type": "audio/wav; codecs=audio/pcm; samplerate=16000",
             Accept: "application/json",
         },
         body,
@@ -62,7 +62,7 @@ async function transcribeWhisperServer(wavFile: File) {
     const data: any = text ? JSON.parse(text) : null;
     const transcript =
         data?.text ??
-        data?.trancription ??
+        data?.transcription ??
         data?.result?.text ??
         "";
 
@@ -87,13 +87,13 @@ export async function POST(req: Request) {
 
         if (!isWav(audio)) {
             return NextResponse.json(
-                { error: "Please upload WAV audio (PSM 16kHz mono recommended)." },
+                { error: "Please upload WAV audio (PCM 16kHz mono recommended)." },
                 { status: 400 }
             );
         }
 
         try {
-            const transcript = await trasncribeAzure(audio);
+            const transcript = await transcribeAzure(audio);
             return NextResponse.json({ transcript, provider: "azure" });
         } catch (azureErr: any) {
             const transcript = await transcribeWhisperServer(audio);
