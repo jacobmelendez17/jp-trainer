@@ -15,7 +15,6 @@ model User {
   emailVerified DateTime?
   image         String?
 
-  // For email/password:
   passwordHash  String?
 
   accounts      Account[]
@@ -92,16 +91,12 @@ model PronunciationSentence {
   challengeId  String
   challenge    PronunciationChallenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
 
-  // Display text (kanji/kana)
   jpText       String
 
-  // Canonical reading to grade against (recommend: hiragana)
   jpReading    String
 
-  // Optional pre-built ruby HTML, if you want perfect furigana rendering
   furiganaHtml String?
 
-  // English translation
   enText       String
 
   createdAt DateTime @default(now())
