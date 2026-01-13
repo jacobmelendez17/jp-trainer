@@ -20,7 +20,7 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const orderIndex = Number(searchParams.get("orderIndex") ?? "0");
     if (!orderIndex || Number.isNaN(orderIndex)) {
-        return NextResponse.json({ error: "Missing/invalud orderIndex" }, { status: 400 });
+        return NextResponse.json({ error: "Missing/invalid orderIndex" }, { status: 400 });
     }
 
     const challenge = await prisma.pronunciationChallenge.findUnique({
