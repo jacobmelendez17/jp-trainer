@@ -11,3 +11,15 @@ type Challenge = {
     isLocked: boolean;
     sentenceCount: number;
 }
+
+function Stars({ n }: { n: number }) {
+    return (
+        <div className="flex gap-1">
+            {Array.from({ length: 5 }).map((_, i) => (
+                <span key={i} className={`text-sm ${i < n ? "text-neutral-800" : "text-neutral-400"}`}>
+                    *
+                </span>
+            ))}
+        </div>
+    );
+}
