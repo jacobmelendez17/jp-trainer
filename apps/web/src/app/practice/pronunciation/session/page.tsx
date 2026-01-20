@@ -16,7 +16,7 @@ function normalizeJP(s: string) {
     return (s || "")
         .trim()
         .replace(/[。．.、,!?\s]/g, "")
-        .replace(/　/g, "")
+        .replace(/ /g, "")
         .toLowerCase();
 }
 
@@ -226,17 +226,62 @@ export default function PronunciationSessionPage() {
                         </div>
                     </div>
 
-                    <div className="rounded-2xl border- border-neutral-800 bg-neutral-50 p-6">
+                    <div className="rounded-2xl border border-neutral-800 bg-neutral-50 p-6">
+                        <div className="text-center text-3xl font-semibold text-neutral-800 leading-snug">
+                            {showFurigana ? (
+                                current.furiganaHtml ? (
+                                    <span dangerouslySetInnerHTML={{ __html: current.furiganaHtml }} />
+                                ) : (
+                                    current.jpText
+                                )
+                            ) : (
+                                current.jpText
+                            )}
+                        </div>
 
+                        {showFurigana && !current.furiganaHtml && (
+                            <div className="mt-3 text-center text-sm text-neutral-700">
+                                Reading key: <span className="font-semibold">{current.jpReading}</span>
+                            </div>
+                        )}
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
+                        <WavRecorder disabled={busy} onWavReady={transcribeAndGrade} />
 
+                        {last?.ok ? (
+                            <button
+                                className="rounded-xl bg-black px-4 py-2 text-sm text-white hover:opacity-90"
+                                onClick={next}
+                            >
+                                Next
+                            </button>
+                        ) : (
+                            <button
+                                className="rounded-xl borderr bg-neutral-800 px-4 py-2 text-sm hover:bg-neutral-50"
+                                onClick={next}
+                            >
+                                Skip
+                            </button>
+                        )}
+
+                        {busy && <span className="text-sm text-neutral-700">Trasncribing...</span>}
                     </div>
 
                     {last && (
                         <div className="rounded-xl border border-neutral-800 bg-white p-3 text-sm space-y-2">
-                            
+                            <div className="text-neutral-800">
+                                Provider: <span className="font-semibold">{last.provider}</span>
+                            </div>
+                            <div className="text-neutral-800">
+                                You said: <span className="font-semibold">{last.transcript}</span>
+                            </div>
+                            <div className="text-neutral-800">
+                                Expected (kana): <span className="font-semibold">{current.jpReading}</span>
+                            </div>
+                            <div className={`font-semibold ${last.ok ? "text-green-700" : "text-red-700"}`}>
+                                {last.ok ? "Correct!" : "Not quite"}
+                            </div>
                         </div>
                     )}
                 </section>
