@@ -39,19 +39,28 @@ export default function WaniKaniSetupPage() {
       try {
         const res = await fetch(`/api/wanikani/kanji-count?levels=${csv}`, {
           signal: ac.signal,
+          cache: "no-store",
         });
+
         if (!res.ok) {
           const text = await res.text().catch(() => "");
           console.error("kanji-count failed:", res.status, text);
           setTotalKanji(0);
           return;
         }
+
         const data = await res.json().catch(() => null);
         setTotalKanji(Number(data?.total ?? 0));
+      } catch (err: any) {
+        // Ignore intentional aborts
+        if (err?.name === "AbortError") return;
+        console.error("kanji-count fetch error:", err);
+        setTotalKanji(0);
       } finally {
         setCountLoading(false);
       }
     })();
+
 
     return () => ac.abort();
   }, [selected]);

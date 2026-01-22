@@ -23,9 +23,7 @@ export default function WkSessionPage() {
     const sp = useSearchParams();
     const router = useRouter();
 
-    const params = new URLSearchParams(window.location.search);
-    const levelsCsv = params.get("levels") ?? "1";
-
+    const levelsCsv = sp.get("levels") ?? "1";
 
     const minLevel = Number(sp.get("minLevel") ?? "1");
     const maxLevel = Number(sp.get("maxLevel") ?? "60");
@@ -46,14 +44,17 @@ export default function WkSessionPage() {
     useEffect(() => {
         (async () => {
             setLoading(true);
+            setIdx(0);
+            setResults([]);
+            setInput("");
+            setRevealed(false);
+            setFeedback(null);
 
             try {
-            const res = await fetch(`/api/wanikani/kanji?levels=${levelsCsv}`);
+            const res = await fetch(`/api/wanikani/kanji?levels=${encodeURIComponent(levelsCsv)}`);
 
-            // Try to parse JSON; if it fails, grab text so we can see what it was
             const contentType = res.headers.get("content-type") ?? "";
             const isJson = contentType.includes("application/json");
-
             const data = isJson ? await res.json() : await res.text();
 
             if (!res.ok) {
@@ -71,7 +72,8 @@ export default function WkSessionPage() {
             setLoading(false);
             }
         })();
-        }, [minLevel, maxLevel, limit]);
+    }, [levelsCsv]);
+
 
     const acceptedNormalized = useMemo(() => {
         if (!current) return [];
