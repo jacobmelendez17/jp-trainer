@@ -62,8 +62,8 @@ export default async function DashboardPage() {
 				<Tile
 					title="Pronunciation"
 					desc="Practice speaking Japanese sentences"
-					href=""
-					enabled={false}
+					href="/practice/pronunciation/setup"
+					enabled={true}
 				/>
 				<Tile
 					title="Sentence Translation"

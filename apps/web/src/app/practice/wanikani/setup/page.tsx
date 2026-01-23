@@ -52,7 +52,6 @@ export default function WaniKaniSetupPage() {
         const data = await res.json().catch(() => null);
         setTotalKanji(Number(data?.total ?? 0));
       } catch (err: any) {
-        // Ignore intentional aborts
         if (err?.name === "AbortError") return;
         console.error("kanji-count fetch error:", err);
         setTotalKanji(0);
