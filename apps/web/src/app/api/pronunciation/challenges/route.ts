@@ -10,6 +10,9 @@ async function getAuthedUserId() {
     const session = await getServerSession();
     const email = session?.user?.email;
     if (!email) return null;
+
+    const user = await prisma.user.findUnique({ where: { email } });
+    return user?.id ?? null;
 }
 
 function computeLocked(orderIndex: number, starsByOrder: Map<Number, number>) {

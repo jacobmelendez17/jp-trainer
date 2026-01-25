@@ -42,7 +42,7 @@ export default function PronunciationSetUpPage() {
     const unlockedCount = useMemo(() => items.filter((c) => !c.isLocked).length, [items]);
 
     return (
-        <main className="min-h-screen bg-[#faf7f0] p06 text-neutral-800">
+        <main className="min-h-screen bg-[#faf7f0] p-6 text-neutral-800">
             <div className="mx-auto max-w-3xl space-y-4">
                 <header className="space-y-1">
                     <h1 className="text-3xl font-bold text-neutral-800">Pronunciation</h1>
@@ -94,7 +94,7 @@ export default function PronunciationSetUpPage() {
                                         </div>
                                         <div className="mt-2 text-xs text-neutral-700">
                                             Sentences: <span className="font-semibold">{c.sentenceCount}</span>
-                                            {c.isLocked && <span className="ml-2 font semibold">Locked</span>}
+                                            {c.isLocked && <span className="ml-2 font-semibold">Locked</span>}
                                         </div>
                                     </button>
                                 );
