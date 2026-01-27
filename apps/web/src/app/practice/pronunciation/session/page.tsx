@@ -86,24 +86,39 @@ export default function PronunciationSessionPage() {
         setLast(null);
         try {
             const fd = new FormData();
-            fd.append("audio", wav, "audio.wav");
+            const mime = (wav as any)?.type?.toLowerCase?.() ?? "";
+            const filename =
+                mime.includes("webm") ? "audio.webm" :
+                mime.includes("mp4") ? "audio.mp4" :
+                mime.includes("wav") ? "audio.wav" :
+                "audio.bin";
+
+            console.log("[recorder] blob", { type: mime, size: wav.size, filename });    
+            fd.append("audio", wav, filename);
 
             const res = await fetch("/api/pronunciation/transcribe", { method: "POST", body: fd });
             const data = await res.json().catch(() => ({}));
 
-            if (!res.ok) throw new Error(data?.error ?? "Transcribe failed");
+            if (!res.ok) {
+            console.error("Transcribe failed:", { status: res.status, data });
+            throw new Error(data?.details ?? data?.error ?? "Transcribe failed");
+            }
 
             const transcript = String(data?.transcript ?? "");
             const provider = String(data?.provider ?? "unknown");
-            const saidReading = normalizeJP(String(data?.reading ?? ""));
+            const readingRaw = String(data?.reading ?? "");
+            const readingNorm = normalizeJP(readingRaw);
 
             const a = normalizeJP(transcript);
             const expectedKana = normalizeJP(current.jpReading);
             const expectedText = normalizeJP(current.jpText);
 
-            const ok = a.length > 0 && (a === expectedKana || a === expectedText);
+            const ok =
+                readingNorm.length > 0
+                    ? readingNorm === expectedKana
+                    : a.length > 0 && (a === expectedKana || a === expectedText);
 
-            setLast({ transcript, provider, ok, reading: saidReading });
+            setLast({ transcript, provider, ok, reading: readingRaw });
 
             if (ok) {
                 setCorrectIds((prev) => new Set(prev).add(current.id));
@@ -126,10 +141,8 @@ export default function PronunciationSessionPage() {
             headers: { "Content-Type": "application/json" },
         });
         const data = await res.json().catch(() => ({}));
-        if (!res.ok) {
-            console.error("Complete failed:", data);
-            return;
-        }
+        if (!res.ok) throw new Error(data?.details ?? data?.error ?? "Transcribe failed");
+
         router.push("/practice/pronunciation/setip");
     }
 
@@ -249,7 +262,7 @@ export default function PronunciationSessionPage() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
-                        <WavRecorder disabled={busy} onWavReady={transcribeAndGrade} />
+                        <WavRecorder disabled={busy} onAudioReady={transcribeAndGrade} />
 
                         {last?.ok ? (
                             <button

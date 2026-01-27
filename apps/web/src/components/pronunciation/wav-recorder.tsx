@@ -1,77 +1,75 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import RecordRTC from "recordrtc";
+import { useRef, useState } from "react";
 
 type Props = {
-    disabled?: boolean;
-    onWavReady: (wav: Blob) => void;
+  disabled?: boolean;
+  onAudioReady: (audio: Blob) => void; // can be webm/mp4; server will convert
 };
 
-export function WavRecorder({ disabled, onWavReady }: Props) {
-    const [recording, setRecording] = useState(false);
-    const recRef = useRef<RecordRTC | null>(null);
-    const streamRef = useRef<MediaStream | null>(null);
+export function WavRecorder({ disabled, onAudioReady }: Props) {
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<BlobPart[]>([]);
+  const streamRef = useRef<MediaStream | null>(null);
 
-    useEffect(() => {
-        return () => {
-            try {
-                recRef.current?.destroy();
-            } catch {}
-            streamRef.current?.getTracks().forEach((t) => t.stop());
-        };
-    }, []);
+  const [recording, setRecording] = useState(false);
 
-    async function start() {
-        if (disabled || recording) return;
+  async function start() {
+    if (disabled || recording) return;
 
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        streamRef.current = stream;
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    streamRef.current = stream;
 
-        const rec = new RecordRTC(stream, {
-            type: "audio",
-            mimeType: "audio/wav",
-            recorderType: RecordRTC.StereoAudioRecorder,
-            numberOfAudioChannels: 1,
-            desiredSampRate: 16000,
-        });
+    // Pick the best mime type the browser supports
+    const preferredTypes = [
+      "audio/webm;codecs=opus",
+      "audio/webm",
+      "audio/mp4", // safari often prefers mp4
+    ];
 
-        recRef.current = rec;
-        rec.startRecording();
-        setRecording(true);
-    }
+    const mimeType =
+      preferredTypes.find((t) => (window as any).MediaRecorder?.isTypeSupported?.(t)) || "";
 
-    async function stop() {
-        const rec = recRef.current;
-        const stream = streamRef.current;
-        if (!rec || !stream) return;
+    chunksRef.current = [];
+    const mr = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+    mediaRecorderRef.current = mr;
 
-        await new Promise<void>((resolve) => {
-            rec.stopRecording(() => resolve());
-        });
+    mr.ondataavailable = (e) => {
+      if (e.data && e.data.size > 0) chunksRef.current.push(e.data);
+    };
 
-        const blob = rec.getBlob();
+    mr.onstop = () => {
+      const blob = new Blob(chunksRef.current, { type: mr.mimeType || "audio/webm" });
+      onAudioReady(blob);
 
-        stream.getTracks().forEach((t) => t.stop());
-        streamRef.current = null;
+      // cleanup mic
+      stream.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+      mediaRecorderRef.current = null;
+      chunksRef.current = [];
+    };
 
-        recRef.current?.destroy();
-        recRef.current = null;
+    mr.start();
+    setRecording(true);
+  }
 
-        setRecording(false);
-        onWavReady(blob);
-    }
-    
-    return (
-        <button
-            type="button"
-            className={`rounded-xl border border-neutral-800 px-4 py-2 text-sm text-neutral-800 ${
-                disabled ? "opacity-50 cursor-not-allowed" : "hover:bg-neutral-50"
-            }`}
-            onClick={recording ? stop : start}
-            disabled={disabled}
-        >
-            {recording ? "Stop recording" : "Record (WAV)"}
-        </button>
-    )
+  function stop() {
+    if (!recording) return;
+    setRecording(false);
+    mediaRecorderRef.current?.stop();
+  }
+
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={recording ? stop : start}
+      className={[
+        "rounded-xl border border-neutral-800 px-4 py-2 text-sm",
+        disabled ? "opacity-50 cursor-not-allowed" : "hover:bg-neutral-50",
+      ].join(" ")}
+    >
+      {recording ? "Stop" : "Record"}
+    </button>
+  );
 }
