@@ -1,6 +1,30 @@
 import { NextResponse } from "next/server";
+import Kuroshiro from "kuroshiro";
+import KuromojiAnalyzer from "kuroshiro-analyzer-kuromoji";
 
 export const runtime = "nodejs";
+
+let kuro: Kuroshiro | null = null;
+async function getKuro() {
+    if (kuro) return kuro;
+    const k = new Kuroshiro();
+    await k.init(new KuromojiAnalyzer());
+    kuro = k;
+    return k;
+}
+
+function normalizeJP(s: string) {
+    return (s || "")
+        .trim()
+        .replace(/[。．.、,!?\s]/g, "")
+        .replace(/ /g, "");
+}
+
+async function toHiraganaReading(text: string) {
+    const k = await getKuro();
+    const hira = await k.convert(text, { to: "hiragana" });
+    return normalizeJP(hira);
+}
 
 function isWav(file: File) {
     const t = (file.type || "").toLowerCase();
@@ -94,11 +118,14 @@ export async function POST(req: Request) {
 
         try {
             const transcript = await transcribeAzure(audio);
-            return NextResponse.json({ transcript, provider: "azure" });
+            const reading = await toHiraganaReading(transcript);
+            return NextResponse.json({ transcript, reading, provider: "azure" });
         } catch (azureErr: any) {
             const transcript = await transcribeWhisperServer(audio);
+            const reading = await toHiraganaReading(transcript);
             return NextResponse.json({
                 transcript,
+                reading,
                 provider: "whisper",
                 azureError: String(azureErr?.message ?? azureErr),
             });

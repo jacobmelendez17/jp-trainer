@@ -37,6 +37,7 @@ export default function PronunciationSessionPage() {
     const [last, setLast] = useState<null | {
         provider: string;
         transcript: string;
+        reading?: string;
         ok: boolean;
     }>(null);
 
@@ -94,6 +95,7 @@ export default function PronunciationSessionPage() {
 
             const transcript = String(data?.transcript ?? "");
             const provider = String(data?.provider ?? "unknown");
+            const saidReading = normalizeJP(String(data?.reading ?? ""));
 
             const a = normalizeJP(transcript);
             const expectedKana = normalizeJP(current.jpReading);
@@ -101,7 +103,7 @@ export default function PronunciationSessionPage() {
 
             const ok = a.length > 0 && (a === expectedKana || a === expectedText);
 
-            setLast({ transcript, provider, ok });
+            setLast({ transcript, provider, ok, reading: saidReading });
 
             if (ok) {
                 setCorrectIds((prev) => new Set(prev).add(current.id));
@@ -275,6 +277,9 @@ export default function PronunciationSessionPage() {
                             </div>
                             <div className="text-neutral-800">
                                 You said: <span className="font-semibold">{last.transcript}</span>
+                            </div>
+                            <div className="text-neutral-800">
+                                Interpreted (kana): <span className="font-semibold">{last.reading}</span>
                             </div>
                             <div className="text-neutral-800">
                                 Expected (kana): <span className="font-semibold">{current.jpReading}</span>
